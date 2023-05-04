@@ -1,29 +1,17 @@
 <?php
+namespace App\Repositories\User;
 
-namespace App\Http\Controllers\api;
-
-use App\Http\Controllers\Controller;
-use App\Http\Requests\users\StoreRequest;
 use App\Models\User;
 use App\Repositories\User\UserRepository;
-use Illuminate\Http\Request;
 
-class UserController extends Controller
-{
-    protected $userRepository;
-    public function __construct(UserRepository $userRepository)
-    {
-        $this->userRepository = $userRepository;
-    }
-    public function store(StoreRequest $request)
-    {
-        $userType = $request->input('user_type');
+class UserModelRepository implements UserRepository{
+    public function store($request, $user_type){
         $user = User::create([
             'username' => $request->username,
             'email' => $request->email,
             'bio' => $request->bio,
         ]);
-        if ($userType == 2) {
+        if ($user_type == 2) {
             $image = $request->file('certification_file');
             $imageName = time() . \Str::random(45) . '.' . $image->extension();
             $image->move(public_path('users/images'), $imageName);
@@ -32,7 +20,7 @@ class UserController extends Controller
                 'file' => $imageName,
             ]);
             $user = User::with('certification')->find($user->id);
-        } elseif ($userType == 3) {
+        } elseif ($user_type == 3) {
             $user->userProfile()->create([
                 'map_location' => $request->input('map_location'),
                 'date_of_birth' => $request->input('date_of_birth'),
@@ -44,13 +32,6 @@ class UserController extends Controller
             'user' => $user,
         ]);
     }
-    // To Store the User with the repository pattern
-    public function storeRepo(StoreRequest $request){
-        $userType = $request->input('user_type');
-        $user = $this->userRepository->store($request, $userType);
-        return response()->json([
-            'message' => 'User created successfully',
-            'user' => $user,
-        ]);
-    }
 }
+
+?>

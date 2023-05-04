@@ -21,5 +21,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::group(['middleware' => ['api'], 'prefix'=>'users'], function(){
     Route::post('/store', [UserController::class, 'store']);
+    // Store the user with repository pattern 
+    Route::post('/storeRepo', [UserController::class, 'storeRepo']);
 });
 
